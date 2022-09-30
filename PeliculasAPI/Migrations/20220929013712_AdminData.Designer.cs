@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using PeliculasAPI;
@@ -12,9 +13,10 @@ using PeliculasAPI;
 namespace PeliculasAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220929013712_AdminData")]
+    partial class AdminData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -285,7 +287,7 @@ namespace PeliculasAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 4,
+                            Id = 8,
                             Nombre = "Aventura"
                         },
                         new
@@ -334,35 +336,35 @@ namespace PeliculasAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 2,
+                            Id = 7,
                             EnCines = true,
                             FechaEstreno = new DateTime(2019, 4, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Titulo = "Avengers: Endgame"
                         },
                         new
                         {
-                            Id = 3,
+                            Id = 8,
                             EnCines = false,
                             FechaEstreno = new DateTime(2019, 4, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Titulo = "Avengers: Infinity Wars"
                         },
                         new
                         {
-                            Id = 4,
+                            Id = 9,
                             EnCines = false,
                             FechaEstreno = new DateTime(2020, 2, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Titulo = "Sonic the Hedgehog"
                         },
                         new
                         {
-                            Id = 5,
+                            Id = 10,
                             EnCines = false,
                             FechaEstreno = new DateTime(2020, 2, 21, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Titulo = "Emma"
                         },
                         new
                         {
-                            Id = 6,
+                            Id = 11,
                             EnCines = false,
                             FechaEstreno = new DateTime(2020, 8, 14, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Titulo = "Wonder Woman 1984"
@@ -393,35 +395,35 @@ namespace PeliculasAPI.Migrations
                         new
                         {
                             ActorId = 6,
-                            PeliculaId = 2,
+                            PeliculaId = 7,
                             Orden = 1,
                             Personaje = "Tony Stark"
                         },
                         new
                         {
                             ActorId = 7,
-                            PeliculaId = 2,
+                            PeliculaId = 7,
                             Orden = 2,
                             Personaje = "Steve Rogers"
                         },
                         new
                         {
                             ActorId = 6,
-                            PeliculaId = 3,
+                            PeliculaId = 8,
                             Orden = 1,
                             Personaje = "Tony Stark"
                         },
                         new
                         {
                             ActorId = 7,
-                            PeliculaId = 3,
+                            PeliculaId = 8,
                             Orden = 2,
                             Personaje = "Steve Rogers"
                         },
                         new
                         {
                             ActorId = 5,
-                            PeliculaId = 4,
+                            PeliculaId = 9,
                             Orden = 1,
                             Personaje = "Dr. Ivo Robotnik"
                         });
@@ -445,47 +447,47 @@ namespace PeliculasAPI.Migrations
                         new
                         {
                             GeneroId = 6,
-                            PeliculaId = 2
+                            PeliculaId = 7
                         },
                         new
                         {
-                            GeneroId = 4,
-                            PeliculaId = 2
-                        },
-                        new
-                        {
-                            GeneroId = 6,
-                            PeliculaId = 3
-                        },
-                        new
-                        {
-                            GeneroId = 4,
-                            PeliculaId = 3
-                        },
-                        new
-                        {
-                            GeneroId = 4,
-                            PeliculaId = 4
+                            GeneroId = 8,
+                            PeliculaId = 7
                         },
                         new
                         {
                             GeneroId = 6,
-                            PeliculaId = 5
+                            PeliculaId = 8
+                        },
+                        new
+                        {
+                            GeneroId = 8,
+                            PeliculaId = 8
+                        },
+                        new
+                        {
+                            GeneroId = 8,
+                            PeliculaId = 9
+                        },
+                        new
+                        {
+                            GeneroId = 6,
+                            PeliculaId = 10
                         },
                         new
                         {
                             GeneroId = 7,
-                            PeliculaId = 5
+                            PeliculaId = 10
                         },
                         new
                         {
                             GeneroId = 6,
-                            PeliculaId = 6
+                            PeliculaId = 11
                         },
                         new
                         {
-                            GeneroId = 4,
-                            PeliculaId = 6
+                            GeneroId = 8,
+                            PeliculaId = 11
                         });
                 });
 
@@ -502,35 +504,6 @@ namespace PeliculasAPI.Migrations
                     b.HasIndex("SalaDeCineId");
 
                     b.ToTable("PeliculasSalasDeCines");
-                });
-
-            modelBuilder.Entity("PeliculasAPI.Entidades.Review", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Comentario")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PeliculaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Puntuacion")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UsuarioId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PeliculaId");
-
-                    b.HasIndex("UsuarioId");
-
-                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("PeliculasAPI.Entidades.SalaDeCine", b =>
@@ -556,19 +529,19 @@ namespace PeliculasAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 4,
+                            Id = 10,
                             Nombre = "Sambil",
                             Ubicacion = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (-69.9118804 18.4826214)")
                         },
                         new
                         {
-                            Id = 5,
+                            Id = 11,
                             Nombre = "Megacentro",
                             Ubicacion = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (-69.856427 18.506934)")
                         },
                         new
                         {
-                            Id = 6,
+                            Id = 12,
                             Nombre = "Village East Cinema",
                             Ubicacion = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (-73.986227 40.730898)")
                         });
@@ -680,23 +653,6 @@ namespace PeliculasAPI.Migrations
                     b.Navigation("Pelicula");
 
                     b.Navigation("SalaDeCine");
-                });
-
-            modelBuilder.Entity("PeliculasAPI.Entidades.Review", b =>
-                {
-                    b.HasOne("PeliculasAPI.Entidades.Pelicula", "Pelicula")
-                        .WithMany()
-                        .HasForeignKey("PeliculaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId");
-
-                    b.Navigation("Pelicula");
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("PeliculasAPI.Entidades.Actor", b =>

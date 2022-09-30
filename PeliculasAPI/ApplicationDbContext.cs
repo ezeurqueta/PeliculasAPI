@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using PeliculasAPI.Entidades;
-using System.Security.Claims;
 
 namespace PeliculasAPI
 {
@@ -32,8 +31,9 @@ namespace PeliculasAPI
 
         private void SeedData(ModelBuilder modelBuilder)
         {
-            var rolAdminId = "59c7720d-4dfb-43cb-b8f0-cc8a4b9726d9";
-            var usuarioAdminId = "e95ce974-ac83-466c-b1d7-942695f4722e";
+
+            var rolAdminId = "9aae0b6d-d50c-4d0a-9b90-2a6873e3845d";
+            var usuarioAdminId = "5673b8cf-12de-44f6-92ad-fae4a77932ad";
 
             var rolAdmin = new IdentityRole()
             {
@@ -44,7 +44,7 @@ namespace PeliculasAPI
 
             var passwordHasher = new PasswordHasher<IdentityUser>();
 
-            var username = "ezequiel@tonic3.com";
+            var username = "felipe@hotmail.com";
 
             var usuarioAdmin = new IdentityUser()
             {
@@ -55,6 +55,7 @@ namespace PeliculasAPI
                 NormalizedEmail = username,
                 PasswordHash = passwordHasher.HashPassword(null, "Aa123456!")
             };
+
             //modelBuilder.Entity<IdentityUser>()
             //    .HasData(usuarioAdmin);
 
@@ -70,11 +71,16 @@ namespace PeliculasAPI
             //        ClaimValue = "Admin"
             //    });
 
-
-
-
             var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
 
+            modelBuilder.Entity<SalaDeCine>()
+               .HasData(new List<SalaDeCine>
+               {
+                    //new SalaDeCine{Id = 1, Nombre = "Agora", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.9388777, 18.4839233))},
+                    new SalaDeCine{Id = 4, Nombre = "Sambil", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.9118804, 18.4826214))},
+                    new SalaDeCine{Id = 5, Nombre = "Megacentro", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-69.856427, 18.506934))},
+                    new SalaDeCine{Id = 6, Nombre = "Village East Cinema", Ubicacion = geometryFactory.CreatePoint(new Coordinate(-73.986227, 40.730898))}
+               });
 
             var aventura = new Genero() { Id = 4, Nombre = "Aventura" };
             var animation = new Genero() { Id = 5, Nombre = "Animación" };
@@ -173,5 +179,7 @@ namespace PeliculasAPI
         public DbSet<PeliculasGeneros> PeliculasGeneros { get; set; }
         public DbSet<SalaDeCine> SalasDeCine { get; set; }
         public DbSet<PeliculasSalasDeCine> PeliculasSalasDeCines { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+
     }
 }

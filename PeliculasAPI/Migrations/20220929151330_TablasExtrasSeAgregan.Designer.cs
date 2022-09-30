@@ -13,8 +13,8 @@ using PeliculasAPI;
 namespace PeliculasAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220927215749_TablasIdentity")]
-    partial class TablasIdentity
+    [Migration("20220929151330_TablasExtrasSeAgregan")]
+    partial class TablasExtrasSeAgregan
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -506,6 +506,35 @@ namespace PeliculasAPI.Migrations
                     b.ToTable("PeliculasSalasDeCines");
                 });
 
+            modelBuilder.Entity("PeliculasAPI.Entidades.Review", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Comentario")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PeliculaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Puntuacion")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UsuarioId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PeliculaId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("Reviews");
+                });
+
             modelBuilder.Entity("PeliculasAPI.Entidades.SalaDeCine", b =>
                 {
                     b.Property<int>("Id")
@@ -530,20 +559,20 @@ namespace PeliculasAPI.Migrations
                         new
                         {
                             Id = 4,
-                            Nombre = "Cine Hoytz",
-                            Ubicacion = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (-64.205367 -31.41262)")
+                            Nombre = "Sambil",
+                            Ubicacion = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (-69.9118804 18.4826214)")
                         },
                         new
                         {
                             Id = 5,
-                            Nombre = "Cine Dinosaurio Mall",
-                            Ubicacion = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (-64.220056 -31.366713)")
+                            Nombre = "Megacentro",
+                            Ubicacion = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (-69.856427 18.506934)")
                         },
                         new
                         {
                             Id = 6,
-                            Nombre = "Cine Rivera Indarte",
-                            Ubicacion = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (-64.290905 -31.334729)")
+                            Nombre = "Village East Cinema",
+                            Ubicacion = (NetTopologySuite.Geometries.Point)new NetTopologySuite.IO.WKTReader().Read("SRID=4326;POINT (-73.986227 40.730898)")
                         });
                 });
 
@@ -653,6 +682,23 @@ namespace PeliculasAPI.Migrations
                     b.Navigation("Pelicula");
 
                     b.Navigation("SalaDeCine");
+                });
+
+            modelBuilder.Entity("PeliculasAPI.Entidades.Review", b =>
+                {
+                    b.HasOne("PeliculasAPI.Entidades.Pelicula", "Pelicula")
+                        .WithMany()
+                        .HasForeignKey("PeliculaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId");
+
+                    b.Navigation("Pelicula");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("PeliculasAPI.Entidades.Actor", b =>
