@@ -1,14 +1,88 @@
 using PeliculasAPI;
+using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+using PeliculasAPI.Servicios;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
+using PeliculasAPI.Helpers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var startup = new Startup(builder.Configuration);
+builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddTransient<IAlmacenadorArchivos, AlmacenadorArchivosLocal>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton<GeometryFactory>(NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326));
 
-startup.ConfigureServices(builder.Services);
+builder.Services.AddScoped<PeliculaExisteAttribute>();
+
+
+builder.Services.AddSingleton(provider =>
+
+    new MapperConfiguration(config =>
+    {
+        var geometryFactory = provider.GetRequiredService<GeometryFactory>();
+        config.AddProfile(new AutoMapperProfiles(geometryFactory));
+    }).CreateMapper()
+);
+
+string jwtKey = Environment.GetEnvironmentVariable("PELICULAS_API_JWT_KEY");
+if (jwtKey == null) throw new Exception("PELICULAS_API_JWT_KEY environment variable not set");
+builder.Services.AddAuthentication()
+    .AddJwtBearer(options =>
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = false,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+                ClockSkew = TimeSpan.Zero
+            });
+
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+          options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+          sqlServerOptions => sqlServerOptions.UseNetTopologySuite()
+          ));
+builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+  .AddEntityFrameworkStores<ApplicationDbContext>()
+  .AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+   .AddJwtBearer(options =>
+       options.TokenValidationParameters = new TokenValidationParameters
+       {
+           ValidateIssuer = false,
+           ValidateAudience = false,
+           ValidateLifetime = true,
+           ValidateIssuerSigningKey = true,
+           IssuerSigningKey = new SymmetricSecurityKey(
+       System.Text.Encoding.UTF8.GetBytes(builder.Configuration["jwt:key"])),
+           ClockSkew = TimeSpan.Zero
+       }
+   );
 
 var app = builder.Build();
 
-var logger = app.Services.GetService(typeof(ILogger<Startup>)) as ILogger<Startup>;
-startup.Configure(app, app.Environment);
+app.UseDeveloperExceptionPage();
+
+app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
+
 
 app.Run();

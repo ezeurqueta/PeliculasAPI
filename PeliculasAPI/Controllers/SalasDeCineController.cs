@@ -4,12 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using PeliculasAPI.DTOs;
 using PeliculasAPI.Entidades;
+using PeliculasAPI.Servicios;
 
 namespace PeliculasAPI.Controllers
 {
     [Route("api/SalasDeCine")]
     [ApiController]
-    public class SalasDeCineController : CustomBaseController
+    public class SalasDeCineController : CustomBaseControllerServices
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;

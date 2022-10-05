@@ -4,44 +4,46 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PeliculasAPI.DTOs;
 using PeliculasAPI.Entidades;
-using PeliculasAPI.Helpers;
-using PeliculasAPI.Servicios;
+using PeliculasAPI.Servicios.Interfaces;
 
-namespace PeliculasAPI.Controllers
+namespace PeliculasAPI.Servicios
 {
-    [ApiController]
-    [Route("api/actores")]
-    public class ActoresController : ActoresServices
+    public class ActoresServices : CustomBaseControllerServices, IActoresServices
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
         private readonly IAlmacenadorArchivos almacenadorArchivos;
         private readonly string contenedor = "actores";
 
-        public ActoresController(ApplicationDbContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos) : base(context, mapper)
+        public ActoresServices(ApplicationDbContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos)
         {
             this.context = context;
             this.mapper = mapper;
             this.almacenadorArchivos = almacenadorArchivos;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<ActorDTO>>> Get([FromQuery] PaginacionDTO paginacionDTO)
+        public ActoresServices(ApplicationDbContext context, IMapper mapper) : base(context, mapper)
         {
-            return ActoresServices.Get(PaginacionDTO paginacionDTO)
         }
 
-        [HttpGet("{id}", Name = "obtenerActor")]
+        public async Task<ActionResult<List<ActorDTO>>> Get(PaginacionDTO paginacionDTO)
+        {
+            return await Get<Actor, ActorDTO>(paginacionDTO);
+        }
+
+
         public async Task<ActionResult<ActorDTO>> Get(int id)
         {
             return await Get<Actor, ActorDTO>(id);
         }
 
-        [HttpPost]
+
+
+
         public async Task<ActionResult> Post([FromForm] ActorCreacionDTO actorCreacionDTO)
         {
             var entidad = mapper.Map<Actor>(actorCreacionDTO);
-            if(actorCreacionDTO.Foto!= null)
+            if (actorCreacionDTO.Foto != null)
             {
                 using (var memoryStream = new MemoryStream())
                 {
@@ -58,11 +60,10 @@ namespace PeliculasAPI.Controllers
         }
 
 
-        [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromForm] ActorCreacionDTO actorCreacionDTO)
         {
             var actorDB = await context.Actores.FirstOrDefaultAsync(x => x.Id == id);
-            if(actorDB == null)
+            if (actorDB == null)
             {
                 return NotFound();
             }
@@ -75,7 +76,7 @@ namespace PeliculasAPI.Controllers
                     await actorCreacionDTO.Foto.CopyToAsync(memoryStream);
                     var contenido = memoryStream.ToArray();
                     var extension = Path.GetExtension(actorCreacionDTO.Foto.FileName);
-                    actorDB.Foto = await almacenadorArchivos.EditarArchivo(contenido, extension, contenedor, actorDB.Foto,actorCreacionDTO.Foto.ContentType);
+                    actorDB.Foto = await almacenadorArchivos.EditarArchivo(contenido, extension, contenedor, actorDB.Foto, actorCreacionDTO.Foto.ContentType);
                 }
             }
 
@@ -83,7 +84,8 @@ namespace PeliculasAPI.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{id}")]
+
+
         public async Task<ActionResult> Patch(int id, [FromBody] JsonPatchDocument<ActorPatchDTO> patchDocument)
         {
             return await Patch<Actor, ActorPatchDTO>(id, patchDocument);
@@ -92,7 +94,7 @@ namespace PeliculasAPI.Controllers
 
 
 
-        [HttpDelete("{id}")]
+
         public async Task<ActionResult> Delete(int id)
         {
             return await Delete<Actor>(id);

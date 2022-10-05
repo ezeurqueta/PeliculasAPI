@@ -5,36 +5,35 @@ using Microsoft.EntityFrameworkCore;
 using PeliculasAPI.DTOs;
 using PeliculasAPI.Entidades;
 using PeliculasAPI.Helpers;
+using PeliculasAPI.Servicios.Interfaces;
 
-
-namespace PeliculasAPI.Controllers
+namespace PeliculasAPI.Servicios
 {
-    public class CustomBaseController : ControllerBase
+    public class CustomBaseControllerServices: ControllerBase
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
 
-        public CustomBaseController(ApplicationDbContext context, IMapper mapper)
+        public CustomBaseControllerServices(ApplicationDbContext context, IMapper mapper)
         {
             this.context = context;
             this.mapper = mapper;
-        }   
+        }
 
-        protected async Task<List<TDTO>> Get<TEntidad, TDTO>() where TEntidad : class
+        public async Task<List<TDTO>> Get<TEntidad, TDTO>() where TEntidad : class
         {
             var entidades = await context.Set<TEntidad>().AsNoTracking().ToListAsync();
             var dtos = mapper.Map<List<TDTO>>(entidades);
             return dtos;
         }
 
-        protected async Task<List<TDTO>> Get<TEntidad, TDTO>(PaginacionDTO paginacionDTO)
-            where TEntidad : class
+        public async Task<List<TDTO>> Get<TEntidad, TDTO>(PaginacionDTO paginacionDTO) where TEntidad : class
         {
             var queryable = context.Set<TEntidad>().AsQueryable();
             return await Get<TEntidad, TDTO>(paginacionDTO, queryable);
         }
 
-        protected async Task<List<TDTO>> Get<TEntidad, TDTO>(PaginacionDTO paginacionDTO,
+        public async Task<List<TDTO>> GetI<TEntidad, TDTO>(PaginacionDTO paginacionDTO,
             IQueryable<TEntidad> queryable)
             where TEntidad : class
         {
@@ -43,7 +42,7 @@ namespace PeliculasAPI.Controllers
             return mapper.Map<List<TDTO>>(entidades);
         }
 
-        protected async Task<ActionResult<TDTO>> Get<TEntidad, TDTO>(int id) where TEntidad : class, IId
+        public async Task<ActionResult<TDTO>> Get<TEntidad, TDTO>(int id) where TEntidad : class, IId
         {
             var entidad = await context.Set<TEntidad>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 
@@ -55,7 +54,7 @@ namespace PeliculasAPI.Controllers
             return mapper.Map<TDTO>(entidad);
         }
 
-        protected async Task<ActionResult> Post<TCreacion, TEntidad, TLectura> 
+        public async Task<ActionResult> Post<TCreacion, TEntidad, TLectura>
             (TCreacion creacionDTO, string nombreRuta) where TEntidad : class, IId
         {
             var entidad = mapper.Map<TEntidad>(creacionDTO);
@@ -66,7 +65,7 @@ namespace PeliculasAPI.Controllers
             return new CreatedAtRouteResult(nombreRuta, new { id = entidad.Id }, dtoLectura);
         }
 
-        protected async Task<ActionResult> Put<TCreacion, TEntidad>
+        public async Task<ActionResult> Put<TCreacion, TEntidad>
             (int id, TCreacion creacionDTO) where TEntidad : class, IId
         {
             var entidad = mapper.Map<TEntidad>(creacionDTO);
@@ -76,7 +75,7 @@ namespace PeliculasAPI.Controllers
             return NoContent();
         }
 
-        protected async Task<ActionResult> Delete<TEntidad>(int id) where TEntidad : class, IId, new()
+        public async Task<ActionResult> Delete<TEntidad>(int id) where TEntidad : class, IId, new()
         {
             var existe = await context.Set<TEntidad>().AnyAsync(x => x.Id == id);
             if (!existe)
@@ -90,7 +89,7 @@ namespace PeliculasAPI.Controllers
             return NoContent();
         }
 
-        protected async Task<ActionResult> Patch<TEntidad, TDTO>(int id, JsonPatchDocument<TDTO> patchDocument)
+        public async Task<ActionResult> Patch<TEntidad, TDTO>(int id, JsonPatchDocument<TDTO> patchDocument)
             where TDTO : class
             where TEntidad : class, IId
         {
@@ -123,5 +122,8 @@ namespace PeliculasAPI.Controllers
 
             return NoContent();
         }
+
+
+
     }
 }
