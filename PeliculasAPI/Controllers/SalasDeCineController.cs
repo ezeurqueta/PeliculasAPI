@@ -5,6 +5,7 @@ using NetTopologySuite.Geometries;
 using PeliculasAPI.DTOs;
 using PeliculasAPI.Entidades;
 using PeliculasAPI.Servicios;
+using PeliculasAPI.Servicios.Interfaces;
 
 namespace PeliculasAPI.Controllers
 {
@@ -15,26 +16,30 @@ namespace PeliculasAPI.Controllers
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
         private readonly GeometryFactory geometryFactory;
+        private readonly ISalasDeCineServicios salasDeCineServicios;
+        private readonly CustomBaseControllerServices customBaseControllerServices;
 
         public SalasDeCineController(ApplicationDbContext context,
-            IMapper mapper, GeometryFactory geometryFactory )
+            IMapper mapper, GeometryFactory geometryFactory, ISalasDeCineServicios salasDeCineServicios, CustomBaseControllerServices customBaseControllerServices )
             : base(context, mapper)
         {
             this.context = context;
             this.mapper = mapper;
             this.geometryFactory = geometryFactory;
+            this.salasDeCineServicios = salasDeCineServicios;
+            this.customBaseControllerServices = customBaseControllerServices;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<SalaDeCineDTO>>> Get()
+        public async Task<ActionResult<List<SalaDeCineDTO>>> Get([FromQuery] BaseFilter baseFilter)
         {
-            return await Get<SalaDeCine, SalaDeCineDTO>();
+            return await customBaseControllerServices.Get<SalaDeCine, SalaDeCineDTO>();
         }
 
         [HttpGet("{id:int}", Name = "obtenerSalaDeCine")]
         public async Task<ActionResult<SalaDeCineDTO>> Get(int id)
         {
-            return await Get<SalaDeCine, SalaDeCineDTO>(id);
+            return await customBaseControllerServices.Get<SalaDeCine, SalaDeCineDTO>(id);
         }
 
 
@@ -43,22 +48,7 @@ namespace PeliculasAPI.Controllers
         public async Task<ActionResult<List<SalaDeCineCercanoDTO>>> Cercanos(
            [FromQuery] SalaDeCineCercanoFiltroDTO filtro)
         {
-            var ubicacionUsuario = geometryFactory.CreatePoint(new Coordinate(filtro.Longitud, filtro.Latitud));
-
-            var salasDeCine = await context.SalasDeCine
-                .OrderBy(x => x.Ubicacion.Distance(ubicacionUsuario))
-                .Where(x => x.Ubicacion.IsWithinDistance(ubicacionUsuario, filtro.DistanciaEnKms * 1000))
-                .Select(x => new SalaDeCineCercanoDTO
-                {
-                    Id = x.Id,
-                    Nombre = x.Nombre,
-                    Latitud = x.Ubicacion.Y,
-                    Longitud = x.Ubicacion.X,
-                    DistanciaEnMetros = Math.Round(x.Ubicacion.Distance(ubicacionUsuario))
-                })
-                .ToListAsync();
-
-            return salasDeCine;
+            return await salasDeCineServicios.Cercanos(filtro);
         }
 
 
@@ -66,20 +56,19 @@ namespace PeliculasAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] SalaDeCineCreacionDTO salaDeCineCreacionDTO)
         {
-            return await
-                Post<SalaDeCineCreacionDTO, SalaDeCine, SalaDeCineDTO>(salaDeCineCreacionDTO, "obtenerSalaDeCine");
+            return await customBaseControllerServices.Post<SalaDeCineCreacionDTO, SalaDeCine, SalaDeCineDTO>(salaDeCineCreacionDTO, "obtenerSalaDeCine");
         } 
 
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, [FromBody] SalaDeCineCreacionDTO salaDeCineCreacionDTO)
         {
-            return await Put<SalaDeCineCreacionDTO, SalaDeCine>(id, salaDeCineCreacionDTO);
+            return await customBaseControllerServices.Put<SalaDeCineCreacionDTO, SalaDeCine>(id, salaDeCineCreacionDTO);
         }
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            return await Delete<SalaDeCine>(id);
+            return await customBaseControllerServices.Delete<SalaDeCine>(id);
         }
     }
 }

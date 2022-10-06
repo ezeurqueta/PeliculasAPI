@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using PeliculasAPI.Servicios.Interfaces;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +18,21 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddTransient<IAlmacenadorArchivos, AlmacenadorArchivosLocal>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<GeometryFactory>(NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326));
+builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
 
 builder.Services.AddScoped<PeliculaExisteAttribute>();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<IActoresServices, ActoresServices>();
+builder.Services.AddScoped<ICuentasServices, CuentasServices>();
+builder.Services.AddScoped<iCustomBaseControllerServices, CustomBaseControllerServices>();
+builder.Services.AddScoped<IGenerosServices, GenerosServices>();
+builder.Services.AddScoped<IPeliculasServices, PeliculasServices>();
+builder.Services.AddScoped<IReviewServices, ReviewServices>();
+builder.Services.AddScoped<ISalasDeCineServicios, SalasDeCineServicios>();
+
+
 
 
 builder.Services.AddSingleton(provider =>

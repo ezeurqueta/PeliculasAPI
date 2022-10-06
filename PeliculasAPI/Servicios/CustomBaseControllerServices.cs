@@ -9,7 +9,7 @@ using PeliculasAPI.Servicios.Interfaces;
 
 namespace PeliculasAPI.Servicios
 {
-    public class CustomBaseControllerServices: ControllerBase
+    public class CustomBaseControllerServices: ControllerBase, iCustomBaseControllerServices
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
@@ -27,19 +27,10 @@ namespace PeliculasAPI.Servicios
             return dtos;
         }
 
-        public async Task<List<TDTO>> Get<TEntidad, TDTO>(PaginacionDTO paginacionDTO) where TEntidad : class
+        public async Task<List<TDTO>> Get<TEntidad, TDTO>(PaginacionDTO paginacionDTO, IQueryable<TEntidad> queryable) where TEntidad : class
         {
-            var queryable = context.Set<TEntidad>().AsQueryable();
+            queryable = context.Set<TEntidad>().AsQueryable();
             return await Get<TEntidad, TDTO>(paginacionDTO, queryable);
-        }
-
-        public async Task<List<TDTO>> GetI<TEntidad, TDTO>(PaginacionDTO paginacionDTO,
-            IQueryable<TEntidad> queryable)
-            where TEntidad : class
-        {
-            await HttpContext.InsertarParametrosPaginacion(queryable, paginacionDTO.CantidadRegistrosPorPagina);
-            var entidades = await queryable.Paginar(paginacionDTO).ToListAsync();
-            return mapper.Map<List<TDTO>>(entidades);
         }
 
         public async Task<ActionResult<TDTO>> Get<TEntidad, TDTO>(int id) where TEntidad : class, IId

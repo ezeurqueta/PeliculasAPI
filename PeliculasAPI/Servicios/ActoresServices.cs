@@ -1,42 +1,30 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using PeliculasAPI.DTOs;
 using PeliculasAPI.Entidades;
+using PeliculasAPI.Helpers;
 using PeliculasAPI.Servicios.Interfaces;
 
 namespace PeliculasAPI.Servicios
 {
-    public class ActoresServices : CustomBaseControllerServices, IActoresServices
+    public class ActoresServices : ControllerBase, IActoresServices
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
         private readonly IAlmacenadorArchivos almacenadorArchivos;
+        private readonly IActionContextAccessor actionContextAccessor;
         private readonly string contenedor = "actores";
 
-        public ActoresServices(ApplicationDbContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos)
+        public ActoresServices(ApplicationDbContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos, IActionContextAccessor actionContextAccessor)
         {
             this.context = context;
             this.mapper = mapper;
             this.almacenadorArchivos = almacenadorArchivos;
+            this.actionContextAccessor = actionContextAccessor;
         }
-
-        public ActoresServices(ApplicationDbContext context, IMapper mapper) : base(context, mapper)
-        {
-        }
-
-        public async Task<ActionResult<List<ActorDTO>>> Get(PaginacionDTO paginacionDTO)
-        {
-            return await Get<Actor, ActorDTO>(paginacionDTO);
-        }
-
-
-        public async Task<ActionResult<ActorDTO>> Get(int id)
-        {
-            return await Get<Actor, ActorDTO>(id);
-        }
-
 
 
 
@@ -86,18 +74,6 @@ namespace PeliculasAPI.Servicios
 
 
 
-        public async Task<ActionResult> Patch(int id, [FromBody] JsonPatchDocument<ActorPatchDTO> patchDocument)
-        {
-            return await Patch<Actor, ActorPatchDTO>(id, patchDocument);
 
-        }
-
-
-
-
-        public async Task<ActionResult> Delete(int id)
-        {
-            return await Delete<Actor>(id);
-        }
     }
 }

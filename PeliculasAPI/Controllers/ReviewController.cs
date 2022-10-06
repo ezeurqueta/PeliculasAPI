@@ -6,55 +6,42 @@ using Microsoft.EntityFrameworkCore;
 using PeliculasAPI.DTOs;
 using PeliculasAPI.Entidades;
 using PeliculasAPI.Helpers;
+using PeliculasAPI.Servicios;
+using PeliculasAPI.Servicios.Interfaces;
 using System.Security.Claims;
 
 namespace PeliculasAPI.Controllers
 {
     [Route("api/peliculas/{peliculaId:int}/review")]
     [ServiceFilter(typeof(PeliculaExisteAttribute))]
-    public class ReviewController : CustomBaseController
+    public class ReviewController : ControllerBase
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
+        private readonly IReviewServices reviewServices;
+        private readonly CustomBaseControllerServices customBaseControllerServices;
 
         public ReviewController(ApplicationDbContext context,
-            IMapper mapper)
-            : base(context, mapper)
+            IMapper mapper, IReviewServices reviewServices, CustomBaseControllerServices customBaseControllerServices)
         {
             this.context = context;
             this.mapper = mapper;
+            this.reviewServices = reviewServices;
+            this.customBaseControllerServices = customBaseControllerServices;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ReviewDTO>>> Get(int peliculaId,
-            [FromQuery] PaginacionDTO paginacionDTO)
+        public async Task<ActionResult<List<ReviewDTO>>> Get([FromQuery] BaseFilter baseFilter)
         {
-            var queryable = context.Reviews.Include(x => x.Usuario).AsQueryable();
-            queryable = queryable.Where(x => x.PeliculaId == peliculaId);
-            return await Get<Review, ReviewDTO>(paginacionDTO, queryable);
+
+            return await reviewServices.Get(baseFilter);
         }
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult> Post(int peliculaId, [FromBody] ReviewCreacionDTO reviewCreacionDTO)
         {
-            var usuarioId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-
-            var reviewExiste = await context.Reviews
-                .AnyAsync(x => x.PeliculaId == peliculaId && x.UsuarioId == usuarioId);
-
-            if (reviewExiste)
-            {
-                return BadRequest("El usuario ya ha escrito un review de esta película");
-            }
-
-            var review = mapper.Map<Review>(reviewCreacionDTO);
-            review.PeliculaId = peliculaId;
-            review.UsuarioId = usuarioId;
-
-            context.Add(review);
-            await context.SaveChangesAsync();
-            return NoContent();
+            return await reviewServices.Post(peliculaId, reviewCreacionDTO, HttpContext);
         }
 
         [HttpPut("{reviewId:int}")]
@@ -62,35 +49,14 @@ namespace PeliculasAPI.Controllers
         public async Task<ActionResult> Put(int peliculaId, int reviewId,
             [FromBody] ReviewCreacionDTO reviewCreacionDTO)
         {
-            var reviewDB = await context.Reviews.FirstOrDefaultAsync(x => x.Id == reviewId);
-
-            if (reviewDB == null) { return NotFound(); }
-
-            var usuarioId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-
-            if (reviewDB.UsuarioId != usuarioId)
-            {
-                return BadRequest("No tiene permisos de editar este review");
-            }
-
-            reviewDB = mapper.Map(reviewCreacionDTO, reviewDB);
-
-            await context.SaveChangesAsync();
-            return NoContent();
+            return await reviewServices.Put(peliculaId, reviewId, reviewCreacionDTO);
         }
 
         [HttpDelete("{reviewId:int}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult> Delete(int reviewId)
         {
-            var reviewDB = await context.Reviews.FirstOrDefaultAsync(x => x.Id == reviewId);
-            if (reviewDB == null) { return NotFound(); }
-            var usuarioId = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
-            if (reviewDB.UsuarioId != usuarioId) { return Forbid(); }
-
-            context.Remove(reviewDB);
-            await context.SaveChangesAsync();
-            return NoContent();
+            return await reviewServices.Delete(reviewId);
         }
     }
 }

@@ -4,12 +4,13 @@ namespace PeliculasAPI.Helpers
 {
     public static class HttpContextExtensions
     {
-        public async static Task InsertarParametrosPaginacion<T>(this HttpContext httpContext,
-            IQueryable<T> queryable, int cantidadRegistrosPorPagina)
+        public static void InsertPaginationParams(this HttpContext httpContext, string entityName, int rangeStart, int rangeEnd, int recordsAmount)
         {
-            double cantidad = await queryable.CountAsync();
-            double cantidadPaginas = Math.Ceiling(cantidad / cantidadRegistrosPorPagina);
-            httpContext.Response.Headers.Add("cantidadPaginas", cantidadPaginas.ToString());
+            httpContext.Response.Headers.Add("Access-Control-Expose-Headers", "Content-Range, Pages-Amount, X-Total-Count");
+            httpContext.Response.Headers.Add("Content-Range", $"{entityName} {rangeStart}-{rangeEnd}/{recordsAmount}");
+            httpContext.Response.Headers.Add("X-Total-Count", recordsAmount.ToString());
+            float pagesAmount = (float)recordsAmount / (rangeEnd - rangeStart + 1);
+            httpContext.Response.Headers.Add("Pages-Amount", Math.Ceiling(pagesAmount).ToString());
         }
 
     }
