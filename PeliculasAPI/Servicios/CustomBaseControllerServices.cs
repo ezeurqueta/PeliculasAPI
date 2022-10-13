@@ -9,7 +9,7 @@ using PeliculasAPI.Servicios.Interfaces;
 
 namespace PeliculasAPI.Servicios
 {
-    public class CustomBaseControllerServices: ControllerBase, iCustomBaseControllerServices
+    public class CustomBaseControllerServices: ControllerBase, ICustomBaseControllerServices
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
@@ -113,8 +113,5 @@ namespace PeliculasAPI.Servicios
 
             return NoContent();
         }
-
-
-
     }
 }

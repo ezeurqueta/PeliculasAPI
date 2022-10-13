@@ -19,15 +19,13 @@ namespace PeliculasAPI.Controllers
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
         private readonly IReviewServices reviewServices;
-        private readonly CustomBaseControllerServices customBaseControllerServices;
 
         public ReviewController(ApplicationDbContext context,
-            IMapper mapper, IReviewServices reviewServices, CustomBaseControllerServices customBaseControllerServices)
+            IMapper mapper, IReviewServices reviewServices, ICustomBaseControllerServices customBaseControllerServices)
         {
             this.context = context;
             this.mapper = mapper;
             this.reviewServices = reviewServices;
-            this.customBaseControllerServices = customBaseControllerServices;
         }
 
         [HttpGet]

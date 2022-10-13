@@ -17,10 +17,10 @@ namespace PeliculasAPI.Controllers
         private readonly IMapper mapper;
         private readonly GeometryFactory geometryFactory;
         private readonly ISalasDeCineServicios salasDeCineServicios;
-        private readonly CustomBaseControllerServices customBaseControllerServices;
+        private readonly ICustomBaseControllerServices customBaseControllerServices;
 
         public SalasDeCineController(ApplicationDbContext context,
-            IMapper mapper, GeometryFactory geometryFactory, ISalasDeCineServicios salasDeCineServicios, CustomBaseControllerServices customBaseControllerServices )
+            IMapper mapper, GeometryFactory geometryFactory, ISalasDeCineServicios salasDeCineServicios,ICustomBaseControllerServices customBaseControllerServices )
             : base(context, mapper)
         {
             this.context = context;

@@ -20,9 +20,9 @@ namespace PeliculasAPI.Controllers
         private readonly IAlmacenadorArchivos almacenadorArchivos;
         private readonly ILogger<PeliculasController> logger;
         private readonly IPeliculasServices peliculasServices;
-        private readonly CustomBaseControllerServices customBaseControllerServices;
+        private readonly ICustomBaseControllerServices customBaseControllerServices;
 
-        public PeliculasController(ApplicationDbContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos, ILogger<PeliculasController> logger, IPeliculasServices peliculasServices, CustomBaseControllerServices customBaseControllerServices )
+        public PeliculasController(ApplicationDbContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos, ILogger<PeliculasController> logger, IPeliculasServices peliculasServices, ICustomBaseControllerServices customBaseControllerServices )
         {
             this.context = context;
             this.mapper = mapper;

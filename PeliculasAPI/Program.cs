@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using PeliculasAPI.Servicios.Interfaces;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using PeliculasApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,7 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<IActoresServices, ActoresServices>();
 builder.Services.AddScoped<ICuentasServices, CuentasServices>();
-builder.Services.AddScoped<iCustomBaseControllerServices, CustomBaseControllerServices>();
+builder.Services.AddScoped<ICustomBaseControllerServices, CustomBaseControllerServices>();
 builder.Services.AddScoped<IGenerosServices, GenerosServices>();
 builder.Services.AddScoped<IPeliculasServices, PeliculasServices>();
 builder.Services.AddScoped<IReviewServices, ReviewServices>();
@@ -86,6 +87,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var isTest = AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName.ToLowerInvariant().Contains("mvc.testing"));
+    if (isTest) dbContext.SeedTestData().Wait();
+}
+
 app.UseDeveloperExceptionPage();
 
 app.UseHttpsRedirection();
@@ -101,3 +109,5 @@ app.UseEndpoints(endpoints =>
 
 
 app.Run();
+
+public partial class Program {}

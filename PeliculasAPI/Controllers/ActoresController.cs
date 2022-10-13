@@ -18,9 +18,9 @@ namespace PeliculasAPI.Controllers
         private readonly IMapper mapper;
         private readonly IAlmacenadorArchivos almacenadorArchivos;
         private readonly IActoresServices actoresServices;
-        private readonly CustomBaseControllerServices customBaseControllerServices;
+        private readonly ICustomBaseControllerServices customBaseControllerServices;
 
-        public ActoresController(ApplicationDbContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos,IActoresServices actoresServices, CustomBaseControllerServices customBaseControllerServices)
+        public ActoresController(ApplicationDbContext context, IMapper mapper, IAlmacenadorArchivos almacenadorArchivos,IActoresServices actoresServices, ICustomBaseControllerServices customBaseControllerServices)
         {
             this.context = context;
             this.mapper = mapper;

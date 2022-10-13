@@ -15,9 +15,9 @@ namespace PeliculasAPI.Controllers
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
         private readonly IGenerosServices generosServices;
-        private readonly CustomBaseControllerServices customBaseControllerServices;
+        private readonly ICustomBaseControllerServices customBaseControllerServices;
 
-        public GenerosController(ApplicationDbContext context, IMapper mapper, IGenerosServices generosServices, CustomBaseControllerServices customBaseControllerServices   )
+        public GenerosController(ApplicationDbContext context, IMapper mapper, IGenerosServices generosServices, ICustomBaseControllerServices customBaseControllerServices  )
         {
             this.context = context;
             this.mapper = mapper;
@@ -40,7 +40,7 @@ namespace PeliculasAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] GeneroCreacionDTO generoCreacionDTO)
         {
-            return await customBaseControllerServices.Post<GeneroCreacionDTO, Genero, GeneroDTO>(generoCreacionDTO, "obtenerGenero");
+            return await  customBaseControllerServices.Post<GeneroCreacionDTO, Genero, GeneroDTO>(generoCreacionDTO, "obtenerGenero");
         }
 
 

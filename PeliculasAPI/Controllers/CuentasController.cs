@@ -24,9 +24,9 @@ namespace PeliculasAPI.Controllers
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
         private readonly ICuentasServices cuentasServices;
-        private readonly iCustomBaseControllerServices customBaseControllerServices;
+        private readonly ICustomBaseControllerServices customBaseControllerServices;
 
-        public CuentasController(UserManager<IdentityUser> userManager,SignInManager<IdentityUser> signInManager,IConfiguration configuration,ApplicationDbContext context,IMapper mapper, ICuentasServices cuentasServices, iCustomBaseControllerServices CustomBaseControllerServices)
+        public CuentasController(UserManager<IdentityUser> userManager,SignInManager<IdentityUser> signInManager,IConfiguration configuration,ApplicationDbContext context,IMapper mapper, ICuentasServices cuentasServices, ICustomBaseControllerServices customBaseControllerServices)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -34,7 +34,7 @@ namespace PeliculasAPI.Controllers
             this.context = context;
             this.mapper = mapper;
             this.cuentasServices = cuentasServices;
-            customBaseControllerServices = CustomBaseControllerServices;
+            this.customBaseControllerServices = customBaseControllerServices;
         }
 
         [HttpPost("Crear")]
