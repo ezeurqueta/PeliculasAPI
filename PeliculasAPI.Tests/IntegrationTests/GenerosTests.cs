@@ -9,6 +9,8 @@ namespace PeliculasAPI.Tests.IntegrationTests
     {
         
         private static readonly string url = "/api/generos";
+        private int generoId = 100;
+
         [TestMethod]
         public async Task Get_All_Actors_Should_Return_200()
         {
@@ -19,7 +21,7 @@ namespace PeliculasAPI.Tests.IntegrationTests
             response.EnsureSuccessStatusCode();
 
             var contentString = await response.Content.ReadAsStringAsync();
-            var content = JsonConvert.DeserializeObject<List<ActorDTO>>(contentString);
+            var content = JsonConvert.DeserializeObject<List<GeneroDTO>>(contentString);
 
             Assert.IsNotNull(content);
         }
@@ -30,7 +32,6 @@ namespace PeliculasAPI.Tests.IntegrationTests
         {
             var factory = BuildWebApplicationFactory(Guid.NewGuid().ToString());
             var client = factory.CreateClient();
-            var generoId = 2;
             var response = await client.GetAsync($"{url}/{generoId}");
             response.EnsureSuccessStatusCode();
 
@@ -51,13 +52,21 @@ namespace PeliculasAPI.Tests.IntegrationTests
                 Nombre ="comedia"
             };
 
-            var response = await client.PostAsJsonAsync($"{url}/new-actor", newGeneroCreator);
+            var response = await client.PostAsJsonAsync(url, newGeneroCreator);
             response.EnsureSuccessStatusCode();
             var dataAsString = await response.Content.ReadAsStringAsync();
-            var newgeneroRequest = JsonConvert.DeserializeObject<GeneroCreacionDTO>(dataAsString);
-
+            var newgeneroRequest = JsonConvert.DeserializeObject<GeneroDTO>(dataAsString);
             Assert.AreEqual(newgeneroRequest.Nombre, newGeneroCreator.Nombre);
 
+        }
+
+        [TestMethod]
+        public async Task DeleteGenero_ShouldReturnNoContent()
+        {
+            var factory = BuildWebApplicationFactory(Guid.NewGuid().ToString());
+            var client = factory.CreateClient();
+            var response = await client.DeleteAsync($"{url}/{generoId}");
+            response.EnsureSuccessStatusCode();
         }
     }
 }

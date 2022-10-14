@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace learning_center_tonic3.Tests
+namespace PeliculasAPI.Tests
 {
     public class AsUserFilter : IAsyncActionFilter
     {

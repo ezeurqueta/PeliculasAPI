@@ -1,12 +1,15 @@
 ﻿using Newtonsoft.Json;
 using PeliculasAPI.DTOs;
+using PeliculasAPI.Entidades;
 using System.Net.Http.Json;
 
 namespace PeliculasAPI.Tests.IntegrationTests
 {
+    [TestClass]
     public class SalasDeCineTests : BasePruebas<Program>
     {
         private static readonly string url = "/api/SalasDeCine";
+        private int salaCineId = 200;
         [TestMethod]
         public async Task Get_All_Actors_Should_Return_200()
         {
@@ -17,7 +20,7 @@ namespace PeliculasAPI.Tests.IntegrationTests
             response.EnsureSuccessStatusCode();
 
             var contentString = await response.Content.ReadAsStringAsync();
-            var content = JsonConvert.DeserializeObject<List<ActorDTO>>(contentString);
+            var content = JsonConvert.DeserializeObject<List<SalaDeCineDTO>>(contentString);
 
             Assert.IsNotNull(content);
         }
@@ -27,7 +30,6 @@ namespace PeliculasAPI.Tests.IntegrationTests
         {
             var factory = BuildWebApplicationFactory(Guid.NewGuid().ToString());
             var client = factory.CreateClient();
-            var salaCineId = 5;
             var response = await client.GetAsync($"{url}/{salaCineId}");
             response.EnsureSuccessStatusCode();
 
@@ -48,13 +50,20 @@ namespace PeliculasAPI.Tests.IntegrationTests
                 Nombre = "hoytz"
             };
 
-            var response = await client.PostAsJsonAsync($"{url}/new-actor", newSalaCineCreator);
+            var response = await client.PostAsJsonAsync(url, newSalaCineCreator);
             response.EnsureSuccessStatusCode();
             var dataAsString = await response.Content.ReadAsStringAsync();
-            var newSalaCineRequest = JsonConvert.DeserializeObject<SalaDeCineCreacionDTO>(dataAsString);
+            var newSalaCineRequest = JsonConvert.DeserializeObject<SalaDeCineDTO>(dataAsString);
 
             Assert.AreEqual(newSalaCineRequest.Nombre, newSalaCineCreator.Nombre);
-
+        }
+        [TestMethod]
+        public async Task DeleteSalaCineId_ShouldReturnNoContent()
+        {
+            var factory = BuildWebApplicationFactory(Guid.NewGuid().ToString());
+            var client = factory.CreateClient();
+            var response = await client.DeleteAsync($"{url}/{salaCineId}");
+            response.EnsureSuccessStatusCode();
         }
     }
 }

@@ -4,11 +4,13 @@ using System.Net.Http.Json;
 
 namespace PeliculasAPI.Tests.IntegrationTests
 {
+    [TestClass]
     public class ReviewTests : BasePruebas<Program>
     {
         private static readonly string url = "/api/review";
+        private int reviewId = 400;
         [TestMethod]
-        public async Task Get_All_Actors_Should_Return_200()
+        public async Task Get_All_Reviews_Should_Return_200()
         {
             var factory = BuildWebApplicationFactory(Guid.NewGuid().ToString());
             var client = factory.CreateClient();
@@ -17,17 +19,16 @@ namespace PeliculasAPI.Tests.IntegrationTests
             response.EnsureSuccessStatusCode();
 
             var contentString = await response.Content.ReadAsStringAsync();
-            var content = JsonConvert.DeserializeObject<List<ActorDTO>>(contentString);
+            var content = JsonConvert.DeserializeObject<List<ReviewDTO>>(contentString);
 
             Assert.IsNotNull(content);
         }
 
         [TestMethod]
-        public async Task Get_should_return_200_and_bring_the_requested_actor()
+        public async Task Get_should_return_200_and_bring_the_requested_review()
         {
             var factory = BuildWebApplicationFactory(Guid.NewGuid().ToString());
             var client = factory.CreateClient();
-            var reviewId = 4;
             var response = await client.GetAsync($"{url}/{reviewId}");
             response.EnsureSuccessStatusCode();
 
@@ -48,13 +49,21 @@ namespace PeliculasAPI.Tests.IntegrationTests
                 Comentario = "Excelente"
             };
 
-            var response = await client.PostAsJsonAsync($"{url}/new-actor", newReviewCreator);
+            var response = await client.PostAsJsonAsync(url, newReviewCreator);
             response.EnsureSuccessStatusCode();
             var dataAsString = await response.Content.ReadAsStringAsync();
-            var newReviewRequest = JsonConvert.DeserializeObject<ReviewCreacionDTO>(dataAsString);
+            var newReviewRequest = JsonConvert.DeserializeObject<ReviewDTO>(dataAsString);
 
             Assert.AreEqual(newReviewRequest.Comentario, newReviewCreator.Comentario);
+        }
 
+        [TestMethod]
+        public async Task DeleteReviewId_ShouldReturnNoContent()
+        {
+            var factory = BuildWebApplicationFactory(Guid.NewGuid().ToString());
+            var client = factory.CreateClient();
+            var response = await client.DeleteAsync($"{url}/{reviewId}");
+            response.EnsureSuccessStatusCode();
         }
     }
 }
