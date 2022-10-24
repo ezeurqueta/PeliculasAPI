@@ -71,20 +71,9 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
   .AddEntityFrameworkStores<ApplicationDbContext>()
   .AddDefaultTokenProviders();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-   .AddJwtBearer(options =>
-       options.TokenValidationParameters = new TokenValidationParameters
-       {
-           ValidateIssuer = false,
-           ValidateAudience = false,
-           ValidateLifetime = true,
-           ValidateIssuerSigningKey = true,
-           IssuerSigningKey = new SymmetricSecurityKey(
-       System.Text.Encoding.UTF8.GetBytes(builder.Configuration["jwt:key"])),
-           ClockSkew = TimeSpan.Zero
-       }
-   );
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -93,6 +82,11 @@ using (var scope = app.Services.CreateScope())
     var isTest = AppDomain.CurrentDomain.GetAssemblies().Any(a => a.FullName.ToLowerInvariant().Contains("mvc.testing"));
     if (isTest) dbContext.SeedTestData().Wait();
 }
+if (app.Environment.IsDevelopment()) {
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 
 app.UseDeveloperExceptionPage();
 

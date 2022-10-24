@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using PeliculasAPI.DTOs;
 using System.Net.Http.Json;
 
@@ -7,7 +8,8 @@ namespace PeliculasAPI.Tests.IntegrationTests
     [TestClass]
     public class ReviewTests : BasePruebas<Program>
     {
-        private static readonly string url = "/api/review";
+        private int peliculaId = 300;
+        private static readonly string url = $"api/peliculas/{peliculaId}/review";
         private int reviewId = 400;
         [TestMethod]
         public async Task Get_All_Reviews_Should_Return_200()
